@@ -3,7 +3,7 @@ import pandas as pd
 from btree_logic import BTree
 from database import Student
 
-# Khởi tạo cây trong session_state để không bị mất khi load lại trang
+
 if 'tree' not in st.session_state:
     st.session_state.tree = BTree(m=3)
     st.session_state.database = [] # Bảng gốc
@@ -36,3 +36,31 @@ st.header("Cấu trúc Chỉ mục (B-Tree Index)")
 dot = st.session_state.tree.get_graphviz_source()
 # Hiển thị lên Streamlit
 st.graphviz_chart(dot)
+
+
+
+st.divider() # Vạch kẻ ngăn cách
+st.header("🔍 Tìm kiếm sinh viên")
+
+search_type = st.radio("Chọn phương thức tìm kiếm:", ["Theo Mã SV (Sử dụng B-Tree Index)", "Theo Họ tên (Quét tuần tự)"])
+
+if search_type == "Theo Mã SV (Sử dụng B-Tree Index)":
+    s_id = st.text_input("Nhập Mã SV cần tìm")
+    if s_id:
+        # Gọi hàm search trong bộ não B-Tree
+        result = st.session_state.tree.search(s_id)
+        if result:
+            st.success(f"✅ Tìm thấy bằng Index: **{result.ho_ten}** - Giới tính: {result.gioi_tinh}")
+        else:
+            st.error("❌ Không tìm thấy sinh viên này.")
+
+else:
+    s_name = st.text_input("Nhập Họ tên cần tìm")
+    if s_name:
+        # Tìm tuần tự trong list database (bảng gốc)
+        results = [s for s in st.session_state.database if s_name.lower() in s["Họ và Tên"].lower()]
+        if results:
+            st.write(f"Tìm thấy {len(results)} kết quả:")
+            st.table(results)
+        else:
+            st.error("❌ Không tìm thấy tên này.")
