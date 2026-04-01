@@ -30,3 +30,9 @@ if st.session_state.database:
     st.table(pd.DataFrame(st.session_state.database))
 else:
     st.info("Chưa có dữ liệu.")
+
+st.header("Cấu trúc Chỉ mục (B-Tree Index)")
+# Lấy đối tượng Graphviz từ cây
+dot = st.session_state.tree.get_graphviz_source()
+# Hiển thị lên Streamlit
+st.graphviz_chart(dot)

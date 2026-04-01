@@ -1,3 +1,5 @@
+from graphviz import Digraph
+
 class BTreeNode:
     def __init__(self, leaf=False):
         self.leaf = leaf
@@ -71,15 +73,38 @@ class BTree:
         parent.keys.insert(i, mid_key)
         parent.values.insert(i, mid_val)
         parent.children.insert(i + 1, new_node)
+
+
+    def get_graphviz_source(self):
+        dot = Digraph(comment='B-Tree Index')
+        dot.attr('node', shape='record', style='filled', fillcolor='lightblue')
         
-    def search(self, k, node=None):
-        if node is None:
-            node = self.root
-        i = 0
-        while i < len(node.keys) and k > node.keys[i]:
-            i += 1
-        if i < len(node.keys) and k == node.keys[i]:
-            return node.values[i]
-        if node.leaf:
-            return None
-        return self.search(k, node.children[i])
+        if self.root:
+            self._build_graph(self.root, dot)
+        return dot
+
+    def _build_graph(self, node, dot):
+        
+        node_id = str(id(node))
+        label = " | ".join(map(str, node.keys))
+        dot.node(node_id, label=f"{{ {label} }}")
+        
+        # Nếu không phải lá, vẽ mũi tên đến các con
+        if not node.leaf:
+            for i, child in enumerate(node.children):
+                child_id = str(id(child))
+                self._build_graph(child, dot)
+                dot.edge(node_id, child_id)
+        
+    # def search(self, k, node=None):
+    #     if node is None:
+    #         node = self.root
+    #     i = 0
+    #     while i < len(node.keys) and k > node.keys[i]:
+    #         i += 1
+    #     if i < len(node.keys) and k == node.keys[i]:
+    #         return node.values[i]
+    #     if node.leaf:
+    #         return None
+    #     return self.search(k, node.children[i])
+    
