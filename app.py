@@ -64,3 +64,24 @@ else:
             st.table(results)
         else:
             st.error("❌ Không tìm thấy tên này.")
+
+
+st.sidebar.divider()
+st.sidebar.header("🗑️ Xóa Sinh viên")
+delete_id = st.sidebar.text_input("Nhập Mã SV muốn xóa")
+
+if st.sidebar.button("Xóa"):
+    if delete_id:
+        # Kiểm tra xem có tồn tại không trước khi xóa
+        target = st.session_state.tree.search(delete_id)
+        if target:
+            # Xóa trong B-Tree
+            st.session_state.tree.delete(delete_id)
+            
+            # Xóa trong danh sách database gốc
+            st.session_state.database = [s for s in st.session_state.database if s["Mã SV"] != delete_id]
+            
+            st.sidebar.warning(f"Đã xóa sinh viên mã {delete_id}")
+            st.rerun() # Load lại trang để cập nhật cây và bảng
+        else:
+            st.sidebar.error("Mã SV không tồn tại!")
