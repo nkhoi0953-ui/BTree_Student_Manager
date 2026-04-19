@@ -17,3 +17,6 @@ students_data.json
 
 # Streamlit
 .streamlit/secrets.toml
+
+.DS_Store
+Thumbs.db
